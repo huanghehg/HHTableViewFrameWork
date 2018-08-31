@@ -1,0 +1,11 @@
+use_frameworks!
+
+target 'HHTableViewFrameWork_Example' do
+  pod 'HHTableViewFrameWork', :path => '../'
+
+  target 'HHTableViewFrameWork_Tests' do
+    inherit! :search_paths
+
+    
+  end
+end

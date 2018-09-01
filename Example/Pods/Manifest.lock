@@ -1,0 +1,16 @@
+PODS:
+  - HHTableViewFrameWork (0.1.0)
+
+DEPENDENCIES:
+  - HHTableViewFrameWork (from `../`)
+
+EXTERNAL SOURCES:
+  HHTableViewFrameWork:
+    :path: "../"
+
+SPEC CHECKSUMS:
+  HHTableViewFrameWork: 797a0e67422098fe470adffedd409dbc6d1f2f5c
+
+PODFILE CHECKSUM: c7f9684a04a12d272a7a14272c8589066f9822c1
+
+COCOAPODS: 1.5.3

@@ -133,10 +133,8 @@
         if (footerViewClass && [footerViewClass conformsToProtocol:@protocol(HHSectionViewProxy)]) {
             return [footerViewClass heightForViewWithViewModel:currectFooterViewModel];
         }
-        return 0;
-    }else {
-        return 0;
     }
+    return 0;
 }
 
 
@@ -146,9 +144,95 @@
     [self.mutableSections addObject:section];
 }
 
+- (void)addSections:(NSArray<HHSectionProxy> *)sections {
+    if (sections) [self.mutableSections addObjectsFromArray:sections];
+}
+
+- (void)insertSection:(id<HHSectionProxy>)section atIndex:(NSInteger)index {
+    NSAssert(section, @"section can not be nil!");
+    if (index <= self.mutableSections.count) {
+        [self.mutableSections insertObject:section atIndex:index];
+    }
+}
+
+- (void)insertSection:(id<HHSectionProxy>)section beforeSection:(id<HHSectionProxy>)baseSection {
+    NSAssert(section, @"section can not be nil!");
+    NSAssert(baseSection, @"baseSection can not be nil!");
+    NSAssert([self.mutableSections containsObject:baseSection], @"baseSection must be contained in sections");
+    if (section && baseSection) {
+        NSUInteger index = [self.mutableSections indexOfObject:baseSection];
+        [self.mutableSections insertObject:section atIndex:index];
+    }
+}
+
+- (void)insertSection:(id<HHSectionProxy>)section behindSection:(id<HHSectionProxy>)baseSection {
+    NSAssert(section, @"section can not be nil!");
+    NSAssert(baseSection, @"baseSection can not be nil!");
+    NSAssert([self.mutableSections containsObject:baseSection], @"baseSection must be contained in sections");
+    if (section && baseSection) {
+        NSUInteger index = [self.mutableSections indexOfObject:baseSection];
+        [self.mutableSections insertObject:section atIndex:index + 1];
+    }
+}
+
+- (void)removeSection:(id<HHSectionProxy>)section {
+    if (section && [self.mutableSections containsObject:section]) {
+        [self.mutableSections removeObject:section];
+    }
+}
+- (void)removeSections:(NSArray<HHSectionProxy> *)sections {
+    __weak typeof(self) weakSelf = self;
+    [sections enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+        __strong typeof(weakSelf) strongSelf = weakSelf;
+        if ([strongSelf.mutableSections containsObject:obj]) {
+            [strongSelf.mutableSections removeObject:obj];
+        }
+    }];
+}
+- (void)removeSectionAtIndex:(NSUInteger)index {
+    if (index < self.mutableSections.count) [self.mutableSections removeObjectAtIndex:index];
+}
+- (void)removeAllSection {
+    [self.mutableSections removeAllObjects];
+}
+
 - (void)reloadData {
     [self.tableView reloadData];
 }
+
+- (void)reloadSection:(id<HHSectionProxy>)section {
+    NSAssert(section, @"section can not be nil");
+    [self reloadSection:section animation:UITableViewRowAnimationNone];
+}
+- (void)reloadSection:(id<HHSectionProxy>)section animation:(UITableViewRowAnimation)animation {
+    NSAssert(section, @"section can not be nil");
+    if ([self.mutableSections containsObject:section]) {
+        [self reloadIndexOfSection:[self.mutableSections indexOfObject:section] animation:animation];
+    }
+}
+
+- (void)reloadSections:(NSArray <HHSectionProxy>*)sections animation:(UITableViewRowAnimation)animation {
+    NSMutableIndexSet *indexSet = [NSMutableIndexSet indexSet];
+    for (id <HHSectionProxy> section in self.mutableSections) {
+        if ([self.mutableSections containsObject:section]) {
+            [indexSet addIndex:[self.mutableSections indexOfObject:section]];
+        }
+    }
+    [self reloadIndexsOfSections:indexSet animation:animation];
+}
+
+- (void)reloadIndexOfSection:(NSInteger)index {
+    [self reloadIndexOfSection:index animation:UITableViewRowAnimationNone];
+}
+- (void)reloadIndexOfSection:(NSInteger)index animation:(UITableViewRowAnimation)animation {
+    NSIndexSet *indexSet = [NSIndexSet indexSetWithIndex:index];
+    [self reloadIndexsOfSections:indexSet animation:animation];
+}
+
+- (void)reloadIndexsOfSections:(NSIndexSet *)indexSet animation:(UITableViewRowAnimation)animation {
+    [self.tableView reloadSections:indexSet withRowAnimation:animation];
+}
+
 
 #pragma mark -- private method
 
